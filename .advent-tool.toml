@@ -1,0 +1,8 @@
+[cache]
+path = ".advent-tool-cache"
+
+[http]
+root = "http://www.adventofcode.com"
+
+[template]
+enabled = true
