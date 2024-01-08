@@ -87,6 +87,8 @@ fixable = ["ALL"]
 src = ["src", "tests"]
 
 [tool.ruff.per-file-ignores]
+    "cli.py" = ["T201"]
+
 [tool.ruff.pydocstyle]
 convention = "google"
 
