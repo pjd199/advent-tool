@@ -1,5 +1,5 @@
 """HTTP interface for the Advent of Code website."""
-import logging
+from logging import info, warning
 from sqlite3 import connect
 
 from pyrate_limiter.abstracts.rate import Duration, Rate
@@ -14,7 +14,6 @@ from advent.lib.config import settings
 _bucket_size = 3
 _rates = [
     Rate(_bucket_size, _bucket_size * Duration.SECOND),
-    Rate(15, Duration.MINUTE),
 ]
 _table = "my-bucket-table"
 _sqlite_connection = connect(
@@ -24,7 +23,7 @@ _sqlite_connection = connect(
 )
 _sqlite_connection.cursor().execute(Queries.CREATE_BUCKET_TABLE.format(table=_table))
 _bucket = SQLiteBucket(_rates, _sqlite_connection, _table)
-limiter = Limiter(_bucket, max_delay=60 * Duration.SECOND)
+limiter = Limiter(_bucket, max_delay=Duration.MINUTE)
 
 
 def fetch(url: str) -> str:
@@ -41,7 +40,7 @@ def fetch(url: str) -> str:
     """
     # apply the rate limiter, delaying until we're good to go
     if _bucket.count() > _bucket_size:
-        logging.info("Enforcing HTTP rate limits")
+        info("Enforcing HTTP rate limits")
     limiter.try_acquire(url)
 
     # prepare the headers and cookies
@@ -50,11 +49,11 @@ def fetch(url: str) -> str:
     if settings.session:
         cookies["session"] = settings.session
     else:
-        logging.warning("No SESSION ID found.")
+        warning("No SESSION ID found.")
 
     # get the URL
     response = get(url, headers=headers, cookies=cookies, timeout=60)
-    logging.info(f"GET - {url} - {response.status_code} {response.reason}")
+    info(f"GET - {url} - {response.status_code} {response.reason}")
 
     # check the response and return the file
     if response.status_code != 200:
