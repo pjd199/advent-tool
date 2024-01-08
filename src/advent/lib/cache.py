@@ -20,7 +20,7 @@ def get_puzzle_page(
         str: the html page
     """
     return _cached_or_fetch(
-        settings.tool_path / f"cache/{user}/{year}/{day}/index.html",
+        settings.tool_path / f"cache/{user}/{year}/{day:02}/index.html",
         f"{settings.http_root}/{year}/day/{day}",
         refresh,
     )
@@ -41,7 +41,7 @@ def get_puzzle_input(
         str: the plaintext puzzle input file
     """
     return _cached_or_fetch(
-        settings.tool_path / f"cache/{user}/{year}/{day}/input.txt",
+        settings.tool_path / f"cache/{user}/{year}/{day:02}/input.txt",
         f"{settings.http_root}/{year}/day/{day}/input",
         refresh,
     )
