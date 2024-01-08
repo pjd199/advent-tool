@@ -57,7 +57,7 @@ def _config_property(*args: str, default: T) -> T:
             break
         if isinstance(section[arg], dict):
             section = section[arg]
-        if type(section[arg]) is type(default):
+        elif type(section[arg]) is type(default):
             return cast(T, section[arg])
     return default
 
