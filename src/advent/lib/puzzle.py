@@ -21,6 +21,7 @@ class Puzzle:
         self.year = year
         self.day = day
         self._html = get_puzzle_page(year, day)
+        self._input = get_puzzle_input(self.year, self.day)
 
     @property
     def title(self) -> str:
@@ -75,7 +76,7 @@ class Puzzle:
         Returns:
             str: the file
         """
-        return get_puzzle_input(self.year, self.day)
+        return self._input
 
     @property
     def url(self) -> str:
