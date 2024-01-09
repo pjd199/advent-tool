@@ -1,6 +1,13 @@
-"""Initialise the package, loading the tool settings."""
+"""Initialise the package."""
+
+from importlib.metadata import PackageNotFoundError, version
 
 from advent.lib.puzzle import Puzzle
+
+try:
+    __version__ = version("advent-tool")
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "uninstalled"
 
 
 def load_puzzle(year: int, day: int) -> Puzzle:
