@@ -1,5 +1,5 @@
 """HTTP interface for the Advent of Code website."""
-from logging import info, warning
+import logging
 from sqlite3 import connect
 
 from pyrate_limiter.abstracts.rate import Duration, Rate
@@ -40,7 +40,7 @@ def fetch(url: str) -> str:
     """
     # apply the rate limiter, delaying until we're good to go
     if _bucket.count() > _bucket_size:
-        info("Enforcing HTTP rate limits")
+        logging.info("Enforcing HTTP rate limits")
     limiter.try_acquire(url)
 
     # prepare the headers and cookies
@@ -49,11 +49,11 @@ def fetch(url: str) -> str:
     if settings.session:
         cookies["session"] = settings.session
     else:
-        warning("No SESSION ID found.")
+        logging.warning("No SESSION ID found.")
 
     # get the URL
     response = get(url, headers=headers, cookies=cookies, timeout=60)
-    info(f"GET - {url} - {response.status_code} {response.reason}")
+    logging.info(f"GET - {url} - {response.status_code} {response.reason}")
 
     # check the response and return the file
     if response.status_code != 200:
