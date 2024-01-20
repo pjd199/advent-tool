@@ -1,8 +1,11 @@
 """Templating system."""
+from logging import getLogger
 from pathlib import Path
 
 from advent.lib.config import settings
 from advent.lib.puzzle import Puzzle
+
+log = getLogger(__name__)
 
 
 def save_template(puzzle: Puzzle) -> None:
@@ -32,7 +35,7 @@ def save_template(puzzle: Puzzle) -> None:
             year=puzzle.year,
             day=puzzle.day,
             title=puzzle.title,
-            url=puzzle.url,
+            url=puzzle.page_url,
         )
 
         # save the template file
@@ -46,6 +49,8 @@ def save_template(puzzle: Puzzle) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w") as file:
             file.write(content)
+
+        log.info(f"Template saved to {path}")
 
 
 _default = '''"""Solve the puzzle Advent of Code for day {day} of the {year} event.
