@@ -97,7 +97,7 @@ settings = Settings(
     # system path
     tool_path=_TOOL_PATH,
     # HTTP
-    http_root=_config_property("http", "root", default="https://www.adventofcode.com"),
+    http_root=_config_property("http", "root", default="https://adventofcode.com"),
     http_user_agent="https://github.com/pjd199/advent-tool",
     # template
     template_save_enabled=_config_property("template", "enabled", default=True),
