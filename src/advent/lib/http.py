@@ -1,11 +1,11 @@
 """HTTP interface for the Advent of Code website."""
-import logging
+from logging import getLogger
 from sqlite3 import connect
 
 from pyrate_limiter.abstracts.rate import Duration, Rate
 from pyrate_limiter.buckets.sqlite_bucket import Queries, SQLiteBucket
 from pyrate_limiter.limiter import Limiter
-from requests import get
+from requests import get, post
 
 from advent.lib.config import settings
 
@@ -25,12 +25,16 @@ _sqlite_connection.cursor().execute(Queries.CREATE_BUCKET_TABLE.format(table=_ta
 _bucket = SQLiteBucket(_rates, _sqlite_connection, _table)
 limiter = Limiter(_bucket, max_delay=Duration.MINUTE)
 
+# get the logger
+log = getLogger(__name__)
 
-def fetch(url: str) -> str:
-    """Download file from URL.
+
+def fetch(url: str, data: dict[str, str] | None = None) -> str:
+    """Download file from URL, optionally POSTing data.
 
     Args:
         url (str): the URL to download.
+        data (dict[str,str] | None): the data to POST
 
     Returns:
         str: the download file
@@ -40,7 +44,7 @@ def fetch(url: str) -> str:
     """
     # apply the rate limiter, delaying until we're good to go
     if _bucket.count() > _bucket_size:
-        logging.info("Enforcing HTTP rate limits")
+        log.info("Enforcing HTTP rate limits")
     limiter.try_acquire(url)
 
     # prepare the headers and cookies
@@ -49,11 +53,16 @@ def fetch(url: str) -> str:
     if settings.session:
         cookies["session"] = settings.session
     else:
-        logging.warning("No SESSION ID found.")
+        log.warning("No SESSION ID found.")
 
-    # get the URL
-    response = get(url, headers=headers, cookies=cookies, timeout=60)
-    logging.info(f"GET - {url} - {response.status_code} {response.reason}")
+    if data:
+        # POST the URL
+        response = post(url, headers=headers, cookies=cookies, timeout=60, data=data)
+        log.info(f"POST - {url} - {response.status_code} {response.reason}")
+    else:
+        # GET the URL
+        response = get(url, headers=headers, cookies=cookies, timeout=60)
+        log.info(f"GET - {url} - {response.status_code} {response.reason}")
 
     # check the response and return the file
     if response.status_code != 200:
