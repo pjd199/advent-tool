@@ -1,7 +1,7 @@
 """Initialise the package."""
-
 from importlib.metadata import PackageNotFoundError, version
 
+from advent.lib.part import PART_ONE, PART_TWO
 from advent.lib.puzzle import Puzzle
 
 try:
@@ -21,3 +21,10 @@ def load_puzzle(year: int, day: int) -> Puzzle:
         Puzzle: requested puzzle data
     """
     return Puzzle(year, day)
+
+
+__all__ = [
+    "load_puzzle",
+    "PART_ONE",
+    "PART_TWO",
+]
