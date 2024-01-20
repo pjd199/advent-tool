@@ -5,6 +5,7 @@ from logging import getLogger
 from re import finditer
 
 from bs4 import BeautifulSoup
+from colorama import Fore, Style
 from markdownify import ATX, BACKSLASH, MarkdownConverter  # type: ignore
 
 from advent.lib.cache import (
@@ -47,8 +48,6 @@ class Puzzle:
             year (int): the puzzle year
             day (int): the puzzle day
         """
-        log.info(f"Loading puzzle for {year} {day}")
-
         self.year = year
         self.day = day
         self.page_url = f"{settings.http_root}/{self.year}/day/{self.day}"
@@ -159,15 +158,18 @@ class Puzzle:
             for code in article.find_all("code")
             if not code.findParent("pre")
         ]:
-            print("It looks like you are using example input data")
+            print(
+                f"{Fore.RED}It looks like you are using "
+                f"example input data{Style.RESET_ALL}"
+            )
             return
 
         # check for previously submitted answers on the puzzle page
         if self.answers[part] is not None:
             if str(answer) != self.answers[part]:
                 print(
-                    "That's not the right answer; "
-                    f"your correct answer was {self.answers[part]}"
+                    "{Fore.RED}That's not the right answer; "
+                    f"your correct answer was {self.answers[part]}{Style.RESET_ALL}"
                 )
             return
 
@@ -182,7 +184,10 @@ class Puzzle:
         )
         if correct is not None and correct == str(answer):
             if str(answer) != correct:
-                print(f"That's not the right answer; your correct answer was {correct}")
+                print(
+                    f"{Fore.RED}That's not the right answer; "
+                    f"your correct answer was {correct}{Style.RESET_ALL}"
+                )
             return
 
         # check for high / low advice from previous submissions
@@ -196,8 +201,8 @@ class Puzzle:
                 )
             ):
                 print(
-                    "Looking at previous responses "
-                    f"your answer is too {'low' if 'low' in message else 'high'}"
+                    "{Fore.RED}Looking at previous responses your answer is "
+                    f"too {'low' if 'low' in message else 'high'}{Style.RESET_ALL}"
                 )
                 return
 
@@ -213,7 +218,8 @@ class Puzzle:
         print(f"Submitted {self.year} {self.day} {part_str}: {answer}")
 
         message = self._extract_submit_message(html)
-        print(message)
+        color = Fore.GREEN if "That's the right answer!" in message else Fore.RED
+        print(f"{color}{message}{Style.RESET_ALL}")
 
         if "That's the right answer!" in message:
             self.refresh()
